@@ -1,20 +1,22 @@
 # EFT Parser
 
-A Python library for parsing and converting EVE Online ship fittings between different formats (EFT, JSON, and YAML).
+A Python library for parsing and converting EVE Online ship fittings between different formats (EFT, JSON, and YAML). Now with full support for **structure fits**!
 
 
 ## Features
 
-- Parse EFT (EVE Fitting Tool) format fittings
+- Parse EFT (EVE Fitting Tool) format fittings for **both ships and structures**
 - Convert fittings between EFT, JSON, and YAML formats
-- Structured data model for ship fittings
+- Structured data model for ship and structure fittings
+- **Automatic structure detection** using a slimmed-down version of the EVE SDE saved to a SQLite database
 - Support for all fitting components:
   - Low/Medium/High slots
   - Rigs
-  - Subsystems
+  - **Subsystems** (for ships) / **Service Slots** (for structures)
   - Drones
+  - **Fighters** (separate from drones)
   - Cargo
-  - Proposes EFT2, a new human readable fitting format that uses markdown headings to deliniate fitting sections rather than file position. 
+- Proposes EFT2, a new human readable fitting format that uses markdown headings to delineate fitting sections rather than file position. 
 
 ## Installation
 
@@ -27,51 +29,89 @@ pip install eft-parser
 ### Creating a Fit Object
 
 ```python
-from parse_fits import Fit, fit_from_eft, fit_from_json, fit_from_yaml
+from eft_parser import Fit, fit_from_eft, fit_from_json, fit_from_yaml
 
-# From EFT format
-eft_data = """
-[Ship Name, Fit Name]
-Module Name, Charge Name
+# Ship fitting example
+ship_eft = """[Tengu, PvE Tengu]
+Ballistic Control System II
+Ballistic Control System II
 
-[Empty Mid slot]
+10MN Afterburner II
+Large Shield Booster II
 
-[Empty High slot]
+Heavy Assault Missile Launcher II
+Heavy Assault Missile Launcher II
 
-Rig Name
+Medium Core Defense Field Extender I
+Medium Core Defense Field Extender I
 
-Subsystem Name, Charge Name
+Tengu Defensive - Adaptive Shielding
+Tengu Electronics - Dissolution Sequencer
+Tengu Engineering - Capacitor Regeneration Matrix
+Tengu Offensive - Accelerated Ejection Bay
+Tengu Propulsion - Fuel Catalyst
 
-Drone Name x5
+Hornet II x5
 
-Cargo Item x100
+Scourge Heavy Assault Missile x1000
 """
-fit = fit_from_eft(eft_data)
-or fit = EFTParser.parse(eft_data)
 
-# From JSON
-json_data = {
-    "ship": "Ship Name",
-    "name": "Fit Name",
-    "low_slots": [{"name": "Module Name", "charge": "Charge Name"}],
-    "mid_slots": [],
-    "high_slots": [],
-    "rigs": [{"name": "Rig Name"}],
-    "subsystems": [{"name": "Subsystem Name", "charge": "Charge Name"}],
-    "drones": [{"name": "Drone Name", "quantity": 5}],
-    "cargo": [{"name": "Cargo Item", "quantity": 100}]
-}
-fit = fit_from_json(json_data)
+# Structure fitting example  
+structure_eft = """[Tatara, Mining Station]
+Standup Armor Plating II
+Standup Damage Control I
 
-# From YAML
-yaml_data = """
-ship: Ship Name
-name: Fit Name
-low_slots:
-  - name: Module Name
-    charge: Charge Name
+Standup Focused Warp Disruptor I
+Standup Stasis Webifier I  
+
+Standup Guided Bomb Launcher I
+Standup Point Defense Battery I
+
+Standup L-Set Mining Proficiency I
+
+Standup Moon Drill I
+Standup Reprocessing Facility I
+
+Standup Locust II x2
+
+Standup Light Missile x5000
 """
-fit = fit_from_yaml(yaml_data)
+
+ship_fit = fit_from_eft(ship_eft)
+structure_fit = fit_from_eft(structure_eft)
+
+# Automatic structure detection
+print(f"Ship fit is structure: {ship_fit.is_structure}")      # False
+print(f"Structure fit is structure: {structure_fit.is_structure}")  # True
+```
+
+### Structure vs Ship Differences
+
+The parser automatically detects structures using the EVE SDE database and handles them differently:
+
+```python
+# For ships - subsystems are populated
+if not fit.is_structure:
+    for subsystem in fit.subsystems:
+        print(f"Subsystem: {subsystem.name}")
+
+# For structures - service_slots are populated  
+if fit.is_structure:
+    for service in fit.service_slots:
+        print(f"Service Slot: {service.name}")
+```
+
+### Working with Fighters
+
+Structures and carriers support fighters as a separate category from drones:
+
+```python
+# Both drones and fighters are supported
+for drone in fit.drones:
+    print(f"Drone: {drone.name} x{drone.quantity}")
+    
+for fighter in fit.fighters:
+    print(f"Fighter: {fighter.name} x{fighter.quantity}")
 ```
 
 ### Converting Between Formats
@@ -80,7 +120,7 @@ fit = fit_from_yaml(yaml_data)
 # Convert to EFT format
 eft_string = fit.to_eft()
 
-# Convert to JSON
+# Convert to JSON (includes structure flag and all new fields)
 json_string = fit.to_json()
 
 # Convert to YAML
@@ -96,12 +136,23 @@ fit_dict = fit.to_dict()
 # Access fit components
 ship_name = fit.ship
 fit_name = fit.name
+is_structure = fit.is_structure
+
+# Slot components
 low_slots = fit.low_slots
-mid_slots = fit.mid_slots
+mid_slots = fit.mid_slots  
 high_slots = fit.high_slots
 rigs = fit.rigs
-subsystems = fit.subsystems
+
+# Ship vs Structure specific
+subsystems = fit.subsystems      # For ships
+service_slots = fit.service_slots # For structures
+
+# Combat units
 drones = fit.drones
+fighters = fit.fighters          # New!
+
+# Items  
 cargo = fit.cargo
 
 # Each component has its own properties
@@ -115,23 +166,26 @@ for drone in fit.drones:
 ## Data Models
 
 ### Fit
-- `ship`: Ship name
+- `ship`: Ship/structure name
 - `name`: Fit name
+- `is_structure`: Boolean flag indicating if this is a structure fit
 - `low_slots`: List of low slot modules
 - `mid_slots`: List of mid slot modules
 - `high_slots`: List of high slot modules
 - `rigs`: List of rigs
-- `subsystems`: List of subsystems
+- `subsystems`: List of subsystems (ships only)
+- `service_slots`: List of service modules (structures only)
 - `drones`: List of drones
+- `fighters`: List of fighters (new!)
 - `cargo`: List of cargo items
 
 ### Module
 - `name`: Module name
 - `charge`: Optional charge name
 
-### Drone
-- `name`: Drone name
-- `quantity`: Number of drones
+### Drone/Fighter
+- `name`: Drone/Fighter name
+- `quantity`: Number of units
 
 ### Cargo
 - `name`: Cargo item name
@@ -140,11 +194,23 @@ for drone in fit.drones:
 ### Rig
 - `name`: Rig name
 
+### Subsystem
+- `name`: Subsystem name
+
+## Database Integration
+
+The parser uses an integrated EVE SDE (Static Data Export) database to:
+- Automatically detect structures vs ships
+- Validate item categories
+- Ensure proper parsing of subsystems vs service slots
+
+The database file (`sde_lite.sqlite`) is included with the package.
+
 ## EFT2 Fitting Format
 
-Proposes a new format that uses markdown syntax to define fitting sections. Fitted charges and item quantities are deliniated with commas. 
+Proposes a new format that uses markdown syntax to define fitting sections. Fitted charges and item quantities are delineated with commas.
 
-Ship name and fit name appear at the top of the file seperated by commas after a single hash sign. 
+Ship name and fit name appear at the top of the file separated by commas after a single hash sign:
 
 ```
 # Caracal, RML v2.0
@@ -159,25 +225,26 @@ Ballistic Control System I
 IFFA Compact Damage Control
 ```
 
-Charges are seperated by commas.
-
+Charges are separated by commas:
 ```
 ## High Slots
 Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
 Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
-Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
-Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
-Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
 ```
-Quantities are also seperated by commas
 
+Quantities are also separated by commas:
 ```
-# Drones
-Hornet I x2
+## Drones
+Hornet I, 2
+
+## Fighters  
+Standup Templar II, 1
 
 ## Cargo
 Scourge Heavy Assault Missile, 300
 ```
+
+For structures, use `## Service Slots` instead of `## Subsystems`.
 
 ## Contributing
 
