@@ -254,21 +254,25 @@ class EFTParser:
 
             elif state.section == 4:
                 if fit_item:
-                    try:
-                        item_category = get_category_info(fit_item)
-                    except Exception as e:
-                        logger.error(f"Error getting category info for {fit_item}: {e}")
-                        item_category = None
+                    if " x" in fit_item:
+                        item = self._parse_cargo(fit_item)
+                        item_category = get_category_info(item.name)
+                        if item_category == 8:
+                            fit.cargo.append(item)
+                    else:
+                        item = self._parse_module(fit_item)
+                        item_category = get_category_info(item.name)
 
                     if fit.is_structure:
-                        fit.service_slots.append(self._parse_module(fit_item))
-                    elif item_category == 32:
-                        fit.subsystems.append(self._parse_subsystem(fit_item))
+                        fit.service_slots.append(item)
+
+                    if item_category == 32:
+                        fit.subsystems.append(item)
                     else:
-                        item = self._parse_drone(fit_item)
-                        item_category = get_category_info(item.name)
                         if item_category == 18:
                             fit.drones.append(item)
+                        else:
+                            fit.cargo.append(item)
 
             elif state.section == 5:
                 if fit_item:
