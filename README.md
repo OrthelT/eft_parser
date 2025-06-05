@@ -14,6 +14,7 @@ A Python library for parsing and converting EVE Online ship fittings between dif
   - Subsystems
   - Drones
   - Cargo
+  - Proposes EFT2, a new human readable fitting format that uses markdown headings to deliniate fitting sections rather than file position. 
 
 ## Installation
 
@@ -138,6 +139,45 @@ for drone in fit.drones:
 
 ### Rig
 - `name`: Rig name
+
+## EFT2 Fitting Format
+
+Proposes a new format that uses markdown syntax to define fitting sections. Fitted charges and item quantities are deliniated with commas. 
+
+Ship name and fit name appear at the top of the file seperated by commas after a single hash sign. 
+
+```
+# Caracal, RML v2.0
+```
+
+Fitting sections are defined by lines starting with a double hash sign:
+```
+## Low Slots
+Ballistic Control System I
+Ballistic Control System I
+Ballistic Control System I
+IFFA Compact Damage Control
+```
+
+Charges are seperated by commas.
+
+```
+## High Slots
+Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
+Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
+Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
+Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
+Prototype 'Arbalest' Heavy Assault Missile Launcher I, Scourge Heavy Assault Missile
+```
+Quantities are also seperated by commas
+
+```
+# Drones
+Hornet I x2
+
+## Cargo
+Scourge Heavy Assault Missile, 300
+```
 
 ## Contributing
 

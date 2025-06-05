@@ -1,0 +1,40 @@
+[Hurricane, PVP Hurricane]
+Medium Armor Repairer II
+Multispectrum Energized Membrane II
+Reactive Armor Hardener
+Damage Control II
+Gyrostabilizer II
+Medium Ancillary Armor Repairer
+
+50MN Y-T8 Compact Microwarpdrive
+Stasis Webifier II
+Medium F-RX Compact Capacitor Booster
+Warp Scrambler II
+
+425mm AutoCannon II
+425mm AutoCannon II
+425mm AutoCannon II
+Small Energy Neutralizer II
+425mm AutoCannon II
+425mm AutoCannon II
+425mm AutoCannon II
+
+Medium Auxiliary Nano Pump I
+Medium Auxiliary Nano Pump I
+Medium Explosive Armor Reinforcer I
+
+
+
+Warrior II x6
+Hammerhead II x1
+
+Republic Fleet Phased Plasma M x1000
+Barrage M x1500
+Republic Fleet EMP M x1000
+Hail M x2500
+Navy Cap Booster 800 x13
+Republic Fleet Fusion M x1000
+Republic Fleet Depleted Uranium M x1000
+Nanite Repair Paste x175
+Improved Exile Booster x1
+
