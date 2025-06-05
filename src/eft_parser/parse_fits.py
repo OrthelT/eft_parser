@@ -254,32 +254,24 @@ class EFTParser:
 
             elif state.section == 4:
                 if fit_item:
-                    if " x" in fit_item:
-                        item = self._parse_cargo(fit_item)
-                        item_category = get_category_info(item.name)
-                        if item_category == 8:
-                            fit.cargo.append(item)
+                    
+                    if fit.is_structure:
+                        fit.service_slots.append(self._parse_module(fit_item))
+                    
                     else:
                         item = self._parse_module(fit_item)
                         item_category = get_category_info(item.name)
 
-                    if fit.is_structure:
-                        fit.service_slots.append(item)
-
                     if item_category == 32:
                         fit.subsystems.append(item)
-                    else:
-                        if item_category == 18:
-                            fit.drones.append(item)
-                        else:
-                            fit.cargo.append(item)
 
             elif state.section == 5:
                 if fit_item:
-                    if fit.drones:
-                        fit.cargo.append(self._parse_cargo(fit_item))
-                    else:
-                        fit.drones.append(self._parse_drone(fit_item))
+                    item = self._parse_drone(fit_item)
+                    item_category = get_category_info(item.name)
+                    if item_category == 18:
+                        fit.drones.append(item)
+                    
             elif state.section == 6:
                 if fit_item:
                     fit.cargo.append(self._parse_cargo(fit_item))
@@ -400,10 +392,10 @@ class ParserState:
 
         if not line:
             self.blank_block_count += 1
-            if self.section < 3 and self.blank_block_count > 1:
+            if self.section < 4 and self.blank_block_count > 1:
                 self.section += 1
                 self.blank_block_count = 0
-            if self.section == 4 and self.blank_block_count > 2:
+            elif self.section == 4 and self.blank_block_count > 2:
                 self.section += 1
                 self.blank_block_count = 0
 
