@@ -32,49 +32,72 @@ pip install eft-parser
 from eft_parser import Fit, fit_from_eft, fit_from_json, fit_from_yaml
 
 # Ship fitting example
-ship_eft = """[Tengu, PvE Tengu]
+ship_eft = """[Tengu, PVE Tengu]
 Ballistic Control System II
 Ballistic Control System II
 
+Multispectrum Shield Hardener II
 10MN Afterburner II
-Large Shield Booster II
+Pithum C-Type Medium Shield Booster
+EM Shield Hardener II
+Pith X-Type Shield Boost Amplifier
+Thukker Large Cap Battery
+Pithum C-Type Medium Shield Booster
 
 Heavy Assault Missile Launcher II
+Sisters Expanded Probe Launcher
+Heavy Assault Missile Launcher II
+Heavy Assault Missile Launcher II
+Covert Ops Cloaking Device II
+Heavy Assault Missile Launcher II
+Heavy Assault Missile Launcher II
 Heavy Assault Missile Launcher II
 
-Medium Core Defense Field Extender I
-Medium Core Defense Field Extender I
+Medium Rocket Fuel Cache Partition I
+Medium Hydraulic Bay Thrusters II
+Medium Capacitor Control Circuit II
 
-Tengu Defensive - Adaptive Shielding
-Tengu Electronics - Dissolution Sequencer
-Tengu Engineering - Capacitor Regeneration Matrix
+Tengu Core - Augmented Graviton Reactor
+Tengu Defensive - Covert Reconfiguration
 Tengu Offensive - Accelerated Ejection Bay
 Tengu Propulsion - Fuel Catalyst
 
-Hornet II x5
+Scourge Rage Heavy Assault Missile x5000
+Scourge Javelin Heavy Assault Missile x5000
+Sisters Core Scanner Probe x16
 
-Scourge Heavy Assault Missile x1000
+
 """
 
 # Structure fitting example  
-structure_eft = """[Tatara, Mining Station]
-Standup Armor Plating II
-Standup Damage Control I
+structure_eft = """
+[Tatara, *05R-7A - Moon Station]
+Standup Layered Armor Plating II
+Standup Ballistic Control System I
+Standup Missile Guidance Enhancer I
 
-Standup Focused Warp Disruptor I
-Standup Stasis Webifier I  
+Standup Warp Disruption Burst Projector
+Standup Focused Warp Disruptor II
+Standup Stasis Webifier II
+Standup Variable Spectrum ECM I
 
-Standup Guided Bomb Launcher I
-Standup Point Defense Battery I
+Standup Guided Bomb Launcher II
+Standup Point Defense Battery II
+Standup Multirole Missile Launcher II
 
-Standup L-Set Mining Proficiency I
+Standup L-Set Moon Drilling Proficiency I
+
 
 Standup Moon Drill I
 Standup Reprocessing Facility I
+Standup Composite Reactor I
 
-Standup Locust II x2
 
 Standup Light Missile x5000
+Standup Heavy Guided Bomb x100
+
+Standup Locust II x12
+
 """
 
 ship_fit = fit_from_eft(ship_eft)

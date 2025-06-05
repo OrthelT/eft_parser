@@ -396,7 +396,7 @@ class ParserState:
 
         if not line:
             self.blank_block_count += 1
-            if self.section < 4 and self.blank_block_count > 1:
+            if self.section < 3 and self.blank_block_count > 1:
                 self.section += 1
                 self.blank_block_count = 0
             if self.section == 4 and self.blank_block_count > 2:
